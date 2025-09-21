@@ -14,15 +14,28 @@ export async function POST(request: NextRequest) {
       location: "us-central1" // Use specific region for Vertex AI
     };
     
-    // Add credentials if specified
-    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Add credentials - prioritize JSON string over file path
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+      try {
+        const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+        vertexConfig.googleAuthOptions = {
+          credentials: credentials
+        };
+      } catch (error) {
+        console.error("Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON:", error);
+        return NextResponse.json({ 
+          error: "Invalid service account JSON format" 
+        }, { status: 500 });
+      }
+    } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
       vertexConfig.googleAuthOptions = {
         keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
       };
     }
+    // If neither is provided, will use default credentials
 
     const vertex = new VertexAI(vertexConfig);
-    const model = vertex.getGenerativeModel({ model: "gemini-2.5-pro" }); // Fixed model name
+    const model = vertex.getGenerativeModel({ model: "gemini-2.5-pro" });
 
     const prompt = `You are a helpful legal assistant with expertise in contract and legal document analysis.
 

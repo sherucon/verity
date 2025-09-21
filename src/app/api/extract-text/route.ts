@@ -18,11 +18,25 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Initialize client with explicit credentials if provided
+    // Initialize client with explicit credentials
     const clientOptions: any = {};
-    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+      // Parse JSON string credentials
+      try {
+        const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+        clientOptions.credentials = credentials;
+      } catch (error) {
+        console.error("Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON:", error);
+        return NextResponse.json({ 
+          error: "Invalid service account JSON format" 
+        }, { status: 500 });
+      }
+    } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      // Fallback to file path
       clientOptions.keyFilename = process.env.GOOGLE_APPLICATION_CREDENTIALS;
     }
+    // If neither is provided, will use default credentials
     
     const client = new DocumentProcessorServiceClient(clientOptions);
     
