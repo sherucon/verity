@@ -251,7 +251,7 @@ export default function ChatInterface({ documentText, disabled }: ChatInterfaceP
             value={currentQuestion}
             onChange={(e) => setCurrentQuestion(e.target.value)}
             placeholder={disabled ? "Upload a document first..." : "Ask a question about the document..."}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
             disabled={disabled || isLoading}
           />
           <button
