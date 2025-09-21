@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactElement } from "react";
+import ReactMarkdown from 'react-markdown';
 
 interface DocumentSummaryProps {
   summary: string;
@@ -30,63 +30,6 @@ export default function DocumentSummary({ summary, isLoading }: DocumentSummaryP
     return null;
   }
 
-  // Function to parse markdown-like formatting from AI response
-  const formatSummary = (text: string) => {
-    // Split by lines and process each line
-    const lines = text.split('\n');
-    const formattedLines: ReactElement[] = [];
-
-    lines.forEach((line, index) => {
-      const trimmedLine = line.trim();
-      
-      if (!trimmedLine) {
-        formattedLines.push(<br key={index} />);
-        return;
-      }
-
-      // Headers (lines starting with #)
-      if (trimmedLine.startsWith('##')) {
-        formattedLines.push(
-          <h3 key={index} className="text-md font-semibold text-gray-800 mt-4 mb-2">
-            {trimmedLine.replace(/^##\s*/, '')}
-          </h3>
-        );
-      } else if (trimmedLine.startsWith('#')) {
-        formattedLines.push(
-          <h2 key={index} className="text-lg font-semibold text-gray-900 mt-4 mb-2">
-            {trimmedLine.replace(/^#\s*/, '')}
-          </h2>
-        );
-      }
-      // Bullet points (lines starting with - or *)
-      else if (trimmedLine.startsWith('-') || trimmedLine.startsWith('*')) {
-        formattedLines.push(
-          <li key={index} className="text-gray-700 mb-1 ml-4">
-            {trimmedLine.replace(/^[-*]\s*/, '')}
-          </li>
-        );
-      }
-      // Bold text (lines starting with **)
-      else if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
-        formattedLines.push(
-          <p key={index} className="font-semibold text-gray-800 mb-2">
-            {trimmedLine.replace(/\*\*/g, '')}
-          </p>
-        );
-      }
-      // Regular paragraphs
-      else {
-        formattedLines.push(
-          <p key={index} className="text-gray-700 mb-2">
-            {trimmedLine}
-          </p>
-        );
-      }
-    });
-
-    return formattedLines;
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -106,10 +49,23 @@ export default function DocumentSummary({ summary, isLoading }: DocumentSummaryP
         Document Summary
       </h2>
       
-      <div className="prose prose-sm max-w-none">
-        <div className="space-y-1">
-          {formatSummary(summary)}
-        </div>
+      <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-800">
+        <ReactMarkdown
+          components={{
+            h1: ({children}) => <h1 className="text-lg font-semibold text-gray-900 mt-4 mb-2">{children}</h1>,
+            h2: ({children}) => <h2 className="text-md font-semibold text-gray-800 mt-4 mb-2">{children}</h2>,
+            h3: ({children}) => <h3 className="text-sm font-semibold text-gray-800 mt-3 mb-1">{children}</h3>,
+            p: ({children}) => <p className="text-gray-700 mb-2 leading-relaxed">{children}</p>,
+            ul: ({children}) => <ul className="list-disc ml-4 mb-3 space-y-1">{children}</ul>,
+            ol: ({children}) => <ol className="list-decimal ml-4 mb-3 space-y-1">{children}</ol>,
+            li: ({children}) => <li className="text-gray-700">{children}</li>,
+            strong: ({children}) => <strong className="font-semibold text-gray-800">{children}</strong>,
+            em: ({children}) => <em className="italic text-gray-700">{children}</em>,
+            blockquote: ({children}) => <blockquote className="border-l-4 border-blue-200 pl-4 italic text-gray-600 my-3">{children}</blockquote>,
+          }}
+        >
+          {summary}
+        </ReactMarkdown>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-100">

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Initialize Vertex AI with proper configuration
     const vertexConfig: VertexAIConfig = { 
       project: process.env.PROJECT_ID!, 
-      location: "us-central1" // Use specific region for Vertex AI
+      location: "us-east1" // Try different region for Vertex AI
     };
     
     // Add credentials - prioritize JSON string over file path

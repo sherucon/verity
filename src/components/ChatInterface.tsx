@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
@@ -176,7 +177,28 @@ export default function ChatInterface({ documentText, disabled }: ChatInterfaceP
                   : "bg-gray-100 text-gray-900"
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+              {message.isUser ? (
+                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+              ) : (
+                <div className="text-sm prose prose-sm max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      p: ({children}) => <p className="text-gray-900 mb-1 last:mb-0">{children}</p>,
+                      ul: ({children}) => <ul className="list-disc ml-4 mb-2 space-y-1">{children}</ul>,
+                      ol: ({children}) => <ol className="list-decimal ml-4 mb-2 space-y-1">{children}</ol>,
+                      li: ({children}) => <li className="text-gray-900">{children}</li>,
+                      strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                      em: ({children}) => <em className="italic text-gray-800">{children}</em>,
+                      code: ({children}) => <code className="bg-gray-200 px-1 py-0.5 rounded text-xs">{children}</code>,
+                      h1: ({children}) => <h1 className="text-base font-semibold text-gray-900 mt-2 mb-1">{children}</h1>,
+                      h2: ({children}) => <h2 className="text-sm font-semibold text-gray-900 mt-2 mb-1">{children}</h2>,
+                      h3: ({children}) => <h3 className="text-sm font-medium text-gray-900 mt-1 mb-1">{children}</h3>,
+                    }}
+                  >
+                    {message.text}
+                  </ReactMarkdown>
+                </div>
+              )}
               <p
                 className={`text-xs mt-1 ${
                   message.isUser ? "text-blue-100" : "text-gray-500"
