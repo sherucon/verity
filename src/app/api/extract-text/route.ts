@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize client with explicit credentials
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clientOptions: any = {};
     
     if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
@@ -60,24 +61,27 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ text });
-  } catch (error: any) {
+  } catch (error) {
     console.error("OCR Error:", error);
     
     // Provide more specific error messages
-    if (error.code === 3) {
+    const errorCode = (error as { code?: number }).code;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
+    if (errorCode === 3) {
       return NextResponse.json({ 
         error: "Invalid request to Document AI. Please check your processor endpoint and project configuration." 
       }, { status: 400 });
     }
     
-    if (error.code === 7) {
+    if (errorCode === 7) {
       return NextResponse.json({ 
         error: "Access denied. Please check your authentication and permissions." 
       }, { status: 403 });
     }
 
     return NextResponse.json({ 
-      error: `Document processing failed: ${error.message}` 
+      error: `Document processing failed: ${errorMessage}` 
     }, { status: 500 });
   }
 }

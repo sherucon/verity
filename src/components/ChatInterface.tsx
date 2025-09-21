@@ -89,7 +89,7 @@ export default function ChatInterface({ documentText, disabled }: ChatInterfaceP
       };
 
       setMessages(prev => [...prev, aiMessage]);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Chat error:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

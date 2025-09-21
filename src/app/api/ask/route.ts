@@ -1,6 +1,15 @@
 import { VertexAI } from "@google-cloud/vertexai";
 import { NextRequest, NextResponse } from "next/server";
 
+interface VertexAIConfig {
+  project: string;
+  location: string;
+  googleAuthOptions?: {
+    credentials?: Record<string, unknown>;
+    keyFilename?: string;
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { documentText, question } = await request.json();
@@ -9,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize Vertex AI with proper configuration
-    const vertexConfig: any = { 
+    const vertexConfig: VertexAIConfig = { 
       project: process.env.PROJECT_ID!, 
       location: "us-central1" // Use specific region for Vertex AI
     };
@@ -59,16 +68,17 @@ Answer:`;
     const answer = result.response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     return NextResponse.json({ answer });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error("Q&A Error:", error);
     
     // Provide more specific error messages
-    if (error.message.includes("SyntaxError") || error.message.includes("<!DOCTYPE")) {
+    if (errorMessage.includes("SyntaxError") || errorMessage.includes("<!DOCTYPE")) {
       return NextResponse.json({ 
         error: "Authentication error with Vertex AI. Please check your credentials and project configuration." 
       }, { status: 500 });
     }
     
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

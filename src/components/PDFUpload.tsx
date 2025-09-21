@@ -77,9 +77,10 @@ export default function PDFUpload({
 
       // Pass the results back to parent
       onDocumentProcessed(text, summary);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Document processing error:", err);
-      setError(err.message || "Failed to process document");
+      const errorMessage = err instanceof Error ? err.message : "Failed to process document";
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
